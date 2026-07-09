@@ -1,6 +1,6 @@
 from fastapi.testclient import TestClient
 
-from line_revenue_bot.main import app
+from line_revenue_bot.main import app, classify_message
 
 client = TestClient(app)
 
@@ -9,6 +9,12 @@ def test_health() -> None:
     response = client.get("/health")
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
+
+
+def test_classifier_property_viewing() -> None:
+    result = classify_message("新宿の物件を内見したいです。明日空いていますか？", "property")
+    assert result.category == "内見希望"
+    assert result.score >= 80
 
 
 def test_admin_test_message() -> None:
@@ -20,7 +26,7 @@ def test_admin_test_message() -> None:
     assert response.status_code == 200
     data = response.json()
     assert data["classification"]["category"] == "内見希望"
-    assert "予約" in data["reply"] or "希望日時" in data["reply"]
+    assert "希望日時" in data["reply"] or "予約" in data["reply"]
 
 
 def test_line_webhook_dry_run() -> None:
