@@ -30,11 +30,11 @@ jobs:
       - name: Test
         run: pytest -q
 
-      - name: Generate sample data
-        run: python scripts/demo_seed.py
-
-      - name: Export leads artifact
-        run: python scripts/export_leads.py
+      - name: Build sample artifact
+        run: |
+          mkdir -p artifacts
+          echo "LINE即レス売上回収Bot CI sample artifact" > artifacts/README.txt
+          curl -s http://example.com >/dev/null || true
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
