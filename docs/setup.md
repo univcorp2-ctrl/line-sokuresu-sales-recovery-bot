@@ -10,22 +10,9 @@ pip install -e ".[dev]"
 uvicorn line_revenue_bot.main:app --reload
 ```
 
-ブラウザで開きます。
+## 2. LINE設定
 
-```text
-http://localhost:8000
-```
-
-## 2. 顧客情報を登録
-
-```bash
-curl -X POST http://localhost:8000/intake/config \
-  -H "Content-Type: application/json" \
-  -H "X-Admin-Token: dev-token-change-me" \
-  -d @examples/intake-property.json
-```
-
-## 3. LINE Developersで必要な値を取得
+LINE DevelopersでMessaging APIチャネルを作成し、以下を本番環境変数に設定します。
 
 ```text
 BOT_LINE_CHANNEL_SECRET=チャネルシークレット
@@ -34,38 +21,33 @@ BOT_LINE_REPLY_DRY_RUN=false
 BOT_LINE_SIGNATURE_VERIFICATION=true
 ```
 
-## 4. Webhook URLを設定
+Webhook URL:
 
 ```text
-https://your-bot.example.com/webhook/line
+https://your-domain.example.com/webhook/line
 ```
 
-## 5. AI返信を有効化
-
-テンプレ返信だけでも稼働します。AI返信を使う場合のみ設定します。
-
-```text
-BOT_OPENAI_API_KEY=OpenAI API Key
-BOT_OPENAI_MODEL=gpt-4.1-mini
-```
-
-## 6. 管理者通知を有効化
-
-```text
-BOT_ADMIN_WEBHOOK_URL=https://example.com/webhook
-```
-
-## 7. 追客ジョブ
+## 3. 顧客情報登録
 
 ```bash
-curl -X POST https://your-bot.example.com/jobs/followups \
+curl -X POST https://your-domain.example.com/intake/config \
+  -H "Content-Type: application/json" \
+  -H "X-Admin-Token: 本番のBOT_ADMIN_API_TOKEN" \
+  -d '{"id":"demo","company_name":"デモ不動産","industry":"property","reservation_url":"https://example.com/reserve","document_url":"https://example.com/docs"}'
+```
+
+## 4. 追客ジョブ
+
+```bash
+curl -X POST https://your-domain.example.com/jobs/followups \
   -H "X-Admin-Token: 本番のBOT_ADMIN_API_TOKEN"
 ```
 
-## 8. 本番デプロイで必要なもの
+## 5. 本番に必要なもの
 
 - HTTPS公開URL
+- LINE Messaging APIチャネル
 - 永続化ストレージ
-- 環境変数設定
 - cron相当の定期実行
-- ログ確認手段
+- 管理者通知Webhook
+- 任意でOpenAI API Key
